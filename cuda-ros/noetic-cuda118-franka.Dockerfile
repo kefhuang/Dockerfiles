@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     locales \
     lsb-release \
     curl \
+    tmux \
     python-is-python3 \
     && dpkg-reconfigure locales \
     && apt-get clean \
@@ -26,6 +27,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
        ros-noetic-desktop-full \
        python3-rosdep \
+       python3-catkin-tools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -33,6 +35,30 @@ RUN apt-get update \
 RUN rosdep init \
     && rosdep fix-permissions \
     && rosdep update
+
+# Franka Installation
+# ---------------
+# Install Franka ROS packages
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       ros-noetic-libfranka \
+       ros-noetic-franka-ros \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# # Install moveit # Under development
+# RUN apt-get update \
+#     && apt-get install -y --no-install-recommends \
+#        ros-noetic-catkin \
+#        python3-wstool \
+#     && apt-get clean \
+#     && rm -rf /var/lib/apt/lists/*
+
+# WORKDIR /root/catkin_ws/src
+# RUN wstool init \
+#     && wstool merge -t . https://raw.githubusercontent.com/moveit/moveit/master/moveit.rosinstall \
+#     && wstool remove moveit_tutorials \
+#     && wstool update -t . 
 
 # Workspace Setup
 # --------------
