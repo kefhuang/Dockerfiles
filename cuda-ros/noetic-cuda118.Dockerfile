@@ -31,6 +31,14 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Additional dependencies for Host without ROS insallation
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       ros-noetic-rosbridge-server \
+       ros-noetic-tf2-web-republisher \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Initialize rosdep
 RUN rosdep init \
     && rosdep fix-permissions \
