@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     git \
     tmux \
+    unzip \
     cmake \
     build-essential \
     python-is-python3 \
@@ -22,27 +23,21 @@ RUN apt-get update && apt-get install -y \
 
 # ISAACLAB Installation
 # -----------------
-# Install Miniconda
-RUN mkdir -p /root/miniconda3 \
-    && wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /root/miniconda3/miniconda.sh \
-    && bash /root/miniconda3/miniconda.sh -b -u -p /root/miniconda3 \
-    && rm /root/miniconda3/miniconda.sh \
-    && source /root/miniconda3/bin/activate \
-    && conda init bash \
-    && conda config --set auto_activate_base false \
-    && conda deactivate
-
-# Install isaac sim
-RUN conda create -n isaaclab python=3.10 -y \
-    && conda activate isaaclab \
-    && pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu118 \
-    && pip install -U pip \
-    && pip install 'isaacsim[all,extscache]==4.5.0' --extra-index-url https://pypi.nvidia.com 
+# Insatll Isaac Sim binaries
+RUN mkdir -p /root/isaacsim \
+    && wget https://download.isaacsim.omniverse.nvidia.com/isaac-sim-standalone%404.5.0-rc.36%2Brelease.19112.f59b3005.gl.linux-x86_64.release.zip -O /root/isaacsim.zip\
+    && unzip /root/isaacsim.zip -d /root/isaacsim \
+    && rm -f /root/isaacsim.zip 
+RUN echo "# Isaac Sim root directory" >> ~/.bashrc \
+    && echo "export ISAACSIM_PATH=\"/root/isaacsim\"" >> ~/.bashrc \
+    && echo "# Isaac Sim python executable" >> ~/.bashrc \
+    && echo "export ISAACSIM_PYTHON_EXE=\"\${ISAACSIM_PATH}/python.sh\"" >> ~/.bashrc
 
 # Install isaac lab
-RUN git clone git@github.com:isaac-sim/IsaacLab.git /root/isaaclab 
+RUN git clone https://github.com/isaac-sim/IsaacLab.git /root/isaaclab 
 WORKDIR /root/isaaclab 
-RUN ./isaaclab.sh --install 
+RUN ln -s /root/isaacsim _isaac_sim
+RUN TERM=xterm /root/isaaclab/isaaclab.sh --install 
 
 # ROS Installation
 # ---------------
