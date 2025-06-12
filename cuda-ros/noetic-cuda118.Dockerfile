@@ -6,11 +6,15 @@ FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install basic system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update \
+    && apt-get install -y \
     locales \
     lsb-release \
     curl \
     tmux \
+    git \
+    vim \
+    iputils-ping \
     python-is-python3 \
     && dpkg-reconfigure locales \
     && apt-get clean \
